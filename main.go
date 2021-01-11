@@ -13,13 +13,13 @@ import (
 * use io.Copy to copy downloaded bytes to file created.
  */
 func main() {
-	resp, err := http.Get("https://i.pximg.net/img-master/img/2019/01/01/10/36/56/72426894_p0_master1200.jpg")
+	resp, err := http.Get("https://www.aozora.gr.jp/cards/000035/files/1578_44923.html")
 	if err != nil {
 		panic(err)
 	}
 	defer resp.Body.Close()
 
-	img, err := os.Create("img.jpg")
+	img, err := os.Create("story.html")
 	if err != nil {
 		panic(err)
 	}
