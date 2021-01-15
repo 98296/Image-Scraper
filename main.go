@@ -20,11 +20,7 @@ func fetchHTML(url string) io.ReadCloser {
 	return resp.Body
 }
 
-func main() {
-	// Go to author page and get the HTML response.
-	body := fetchHTML("https://www.aozora.gr.jp/index_pages/person20.html")
-	defer body.Close()
-
+func tokenize(body io.ReadCloser) {
 	tokenizer := html.NewTokenizer(body)
 	for {
 		tokenType := tokenizer.Next()
@@ -39,22 +35,34 @@ func main() {
 			log.Fatalf("error tokenizing HTML: %v", tokenizer.Err())
 		}
 
-		//process the token according to the token type...
-		//if this is a start tag token...
+		// After the above checks, process the html.
 		if tokenType == html.StartTagToken {
-			//get the token
+			// Get the token
 			token := tokenizer.Token()
-			//if the name of the element is "title"
-			if "title" == token.Data {
+			if "ol" == token.Data {
+				for {
+					if tokenType
+				}
+
+
+
+
 				//the next token should be the page title
-				tokenType = tokenizer.Next()
+				for tokenType = tokenizer.Next()
 				//just make sure it's actually a text token
 				if tokenType == html.TextToken {
 					//report the page title and break out of the loop
 					fmt.Println(tokenizer.Token().Data)
-					break
 				}
 			}
 		}
 	}
+}
+
+func main() {
+	// Go to author page and get the HTML response.
+	body := fetchHTML("https://www.aozora.gr.jp/index_pages/person20.html")
+	defer body.Close()
+
+	tokenize(body)
 }
