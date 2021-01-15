@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -25,7 +24,7 @@ func main() {
 		for i := 0; i < len(arr)-1; i++ {
 			//temp := strings.Split(arr[i], "\"") // Get the link.
 			//temp := strings.Split(arr[i])
-			fmt.Println(temp)
+			//fmt.Println(temp)
 		}
 		// for i, v := range links {
 		// 	fmt.Println(i, v)
@@ -49,10 +48,18 @@ func main() {
 // <li><a href="go over there">そ</a></li>
 // </ol>
 // <h2>HERE WE GO</h2>`
-// re := regexp.MustCompile(`\">.*?\<`)
+// re := regexp.MustCompile(`\">.*?\</a>`)
+// 	res := re.FindAllString(a, -1)
+// 	for _, v := range res {
+// 		nv := strings.Trim(v, "\">")
+// 		nv = strings.Trim(nv, "</a>")
+// 		fmt.Println(nv)
+// 	}
+
+// This gets the link.
+// re := regexp.MustCompile(`\".*?\"`)
 // res := re.FindAllString(a, -1)
 // for _, v := range res {
-// 	nv := strings.Trim(v, "\">")
-// 	nv = strings.Trim(nv, "<")
+// 	nv := strings.Trim(v, "\"")
 // 	fmt.Println(nv)
 // }
