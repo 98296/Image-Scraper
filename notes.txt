@@ -1,2 +1,7 @@
 Unzipping JP zipfiles.
 unzip -O shift-jis fire.zip
+
+*** Assumptions ***
+All links to works on an author page start with "../cards" and therefore all links of a given
+work are:
+https://www.aozora.gr.jp + "/cards"

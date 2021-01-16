@@ -5,9 +5,13 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 
 	"golang.org/x/net/html"
 )
+
+// Default URL for creating links to works.
+var defURL string = "https://www.aozora.gr.jp"
 
 // FetchHTML takes in a url and returns the responses body.
 func FetchHTML(url string) io.ReadCloser {
@@ -18,9 +22,9 @@ func FetchHTML(url string) io.ReadCloser {
 	return resp.Body
 }
 
-// TokenizeAP takes a response body of an author's page then tokenizes it
+// ParseAP takes a response body of an author's page then parses it
 // to build a map of titles with their links.
-func TokenizeAP(body io.ReadCloser) map[string]string {
+func ParseAP(body io.ReadCloser) map[string]string {
 	retval := make(map[string]string)
 	z := html.NewTokenizer(body)
 	for {
@@ -49,10 +53,16 @@ func TokenizeAP(body io.ReadCloser) map[string]string {
 					tt = z.Next()
 					token = z.Token()
 					title := token.Data
-					// Add the title with it's corresponding link to the map.
+					// Add the title with it's corresponding link to the map, if it exists.
 					if len(link) > 0 {
 						if link[0].Key == "href" {
-							retval[title] = link[0].Val
+							wl := link[0].Val
+							// The webiste has inline link elements that are not works.
+							// Do NOT add those.
+							if !(strings.Contains(wl, "person")) {
+								wl = defURL + strings.TrimLeft(wl, "..")
+								retval[title] = wl
+							}
 						}
 					}
 				}
