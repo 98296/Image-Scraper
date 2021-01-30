@@ -13,15 +13,6 @@ import (
 // Default URL for creating links to works.
 var defURL string = "https://www.aozora.gr.jp"
 
-// FetchHTML takes in a url and returns the responses body.
-func FetchHTML(url string) (io.ReadCloser, error) {
-	resp, err := http.Get(url)
-	if err != nil {
-		return nil, err
-	}
-	return resp.Body, nil
-}
-
 // ParseAP takes a response body of an author's page then parses it
 // to build a map of titles with their links.
 func ParseAP(body io.ReadCloser) map[string]string {
@@ -135,26 +126,26 @@ func DownloadFile(fn string, url string) error {
 // a map of links (ml). On each link, it downloads the file and saves it to the
 // provided dn.
 func DownloadWorks(dn string, ml map[string]string) error {
-	i := 0
+	//i := 0
 	for key, val := range ml {
 		// Get the response from a single work's link.
-		body, err := FetchHTML(val)
+		resp, err := http.Get(val)
 		if err != nil {
 			return err
 		}
-		defer body.Close()
+		defer resp.Body.Close()
 
 		// Then on that web page, find the link to the zip of the work.
-		zl := GetZipLink(body, val)
+		zl := GetZipLink(resp.Body, val)
 		fn := dn + "/" + key + ".zip"
 		err = DownloadFile(fn, zl)
 		if err != nil {
 			return err
 		}
-		if i == 1 {
-			break
-		}
-		i++
+		// if i == 1 {
+		// 	break
+		// }
+		// i++
 	}
 	return nil
 }

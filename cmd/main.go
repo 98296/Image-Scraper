@@ -3,6 +3,7 @@ package main
 import (
 	"AozoraScraper/scraper"
 	"flag"
+	"net/http"
 	"os"
 )
 
@@ -11,15 +12,15 @@ func main() {
 	dn := flag.String("dn", "works", "The directory you want to save the author's work, too. Must be a new folder")
 	flag.Parse()
 
-	// Go to author page and get the HTML response.
-	body, err := scraper.FetchHTML(*ap)
+	// Go to author page to get the HTML response.
+	resp, err := http.Get(*ap)
 	if err != nil {
 		panic(err)
 	}
-	defer body.Close()
+	defer resp.Body.Close()
 
 	// Tokenize the author page into a map of URLs.
-	mm := scraper.ParseAP(body)
+	mm := scraper.ParseAP(resp.Body)
 
 	// Create a directory (directory name) to save the work to.
 	err = os.Mkdir(*dn, 0755)
