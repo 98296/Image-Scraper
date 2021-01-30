@@ -126,26 +126,40 @@ func DownloadFile(fn string, url string) error {
 // a map of links (ml). On each link, it downloads the file and saves it to the
 // provided dn.
 func DownloadWorks(dn string, ml map[string]string) error {
-	//i := 0
+	c := make(chan error)
+	// i := 2
 	for key, val := range ml {
-		// Get the response from a single work's link.
-		resp, err := http.Get(val)
-		if err != nil {
-			return err
-		}
-		defer resp.Body.Close()
+		go func(c chan error) {
+			// Get the response from a single work's link.
+			resp, err := http.Get(val)
+			if err != nil {
+				resp.Body.Close()
+				c <- err
+				return
+			}
+			defer resp.Body.Close()
 
-		// Then on that web page, find the link to the zip of the work.
-		zl := GetZipLink(resp.Body, val)
-		fn := dn + "/" + key + ".zip"
-		err = DownloadFile(fn, zl)
-		if err != nil {
-			return err
+			// Then on that web page, find the link to the zip of the work.
+			zl := GetZipLink(resp.Body, val)
+			fn := dn + "/" + key + ".zip"
+			err = DownloadFile(fn, zl)
+			if err != nil {
+				c <- err
+				return
+			}
+			c <- nil
+		}(c)
+
+		cherr := <-c
+		if cherr != nil {
+			close(c)
+			return cherr
 		}
-		// if i == 1 {
+		// if i == 0 {
 		// 	break
 		// }
-		// i++
+		// i--
 	}
+	close(c)
 	return nil
 }
