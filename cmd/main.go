@@ -3,7 +3,6 @@ package main
 import (
 	"AozoraScraper/scraper"
 	"flag"
-	"log"
 	"os"
 )
 
@@ -13,29 +12,25 @@ func main() {
 	flag.Parse()
 
 	// Go to author page and get the HTML response.
-	body := scraper.FetchHTML(*ap)
+	body, err := scraper.FetchHTML(*ap)
+	if err != nil {
+		panic(err)
+	}
 	defer body.Close()
 
 	// Tokenize the author page into a map of URLs.
 	mm := scraper.ParseAP(body)
 
 	// Create a directory (directory name) to save the work to.
-	err := os.Mkdir(*dn, 0755)
+	err = os.Mkdir(*dn, 0755)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
-	i := 0
-	for key, val := range mm {
-		// Get the response from a single work's link.
-		body = scraper.FetchHTML(val)
-		// Then on that web page, find the link to the zip of the work.
-		zl := scraper.GetZipLink(body, val)
-		fn := *dn + "/" + key + ".zip"
-		scraper.DownloadFile(fn, zl)
-		if i == 1 {
-			break
-		}
-		i++
+	// Now download all the zips from that map of links and save to the provided
+	// directory name.
+	err = scraper.DownloadWorks(*dn, mm)
+	if err != nil {
+		panic(err)
 	}
 }
