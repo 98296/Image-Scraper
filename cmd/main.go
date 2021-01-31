@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	ap := flag.String("ap", "https://www.aozora.gr.jp/index_pages/person20.html", "The url to the author's page")
+	ap := flag.String("ap", "https://www.aozora.gr.jp/index_pages/person11.html", "The url to the author's page")
 	dn := flag.String("dn", "works", "The directory you want to save the author's work, too. Must be a new folder")
 	flag.Parse()
 
@@ -20,7 +20,10 @@ func main() {
 	defer resp.Body.Close()
 
 	// Tokenize the author page into a map of URLs.
-	mm := scraper.ParseAP(resp.Body)
+	mm, err := scraper.ParseAP(resp.Body)
+	if err != nil {
+		panic(err)
+	}
 
 	// Create a directory (directory name) to save the work to.
 	err = os.Mkdir(*dn, 0755)

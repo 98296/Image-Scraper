@@ -1,8 +1,8 @@
 package scraper
 
 import (
+	"errors"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -15,13 +15,13 @@ var defURL string = "https://www.aozora.gr.jp"
 
 // ParseAP takes a response body of an author's page then parses it
 // to build a map of titles with their links.
-func ParseAP(body io.ReadCloser) map[string]string {
+func ParseAP(body io.ReadCloser) (map[string]string, error) {
 	retval := make(map[string]string)
 	z := html.NewTokenizer(body)
 	for {
 		tt := z.Next()
 		if tt == html.ErrorToken {
-			return retval
+			return nil, errors.New("Error in ParseAP html.ErrorToken")
 		}
 
 		if tt == html.StartTagToken { // I'm looking for first occurence of <ol>
@@ -35,7 +35,7 @@ func ParseAP(body io.ReadCloser) map[string]string {
 						token = z.Token()
 						// If the closing </ol> tag is found, we're done, return.
 						if tt == html.EndTagToken && token.Data == "ol" {
-							return retval
+							return retval, nil
 						}
 					}
 					// Get the link first. <a href=....
@@ -66,12 +66,12 @@ func ParseAP(body io.ReadCloser) map[string]string {
 // to find the zip link for the author's work. The url to the zip is
 // returned as a string. The baseURL parameter is used to build the returned
 // url.
-func GetZipLink(body io.ReadCloser, baseURL string) string {
+func GetZipLink(body io.ReadCloser, baseURL string) (string, error) {
 	z := html.NewTokenizer(body)
 	for {
 		tt := z.Next()
 		if tt == html.ErrorToken {
-			log.Fatal("GetZipLink failure in parsing HTML.")
+			return "", errors.New("func GetZipLink failure in parsing HTML")
 		}
 		// I'm looking for <a>
 		if tt == html.StartTagToken {
@@ -88,7 +88,7 @@ func GetZipLink(body io.ReadCloser, baseURL string) string {
 							// part at the end from https://www.aozora.gr.jp/cards/000020/cardxxx.html
 							// and put the zl at the end.
 							url := bURL[0] + "//" + bURL[2] + "/" + bURL[3] + "/" + bURL[4] + "/" + zl
-							return url
+							return url, nil
 						}
 					}
 				}
@@ -125,22 +125,29 @@ func DownloadFile(fn string, url string) error {
 // DownloadWorks takes a directory name, such as "works" then iterates through
 // a map of links (ml). On each link, it downloads the file and saves it to the
 // provided dn.
+// If an error occurs, it will be appended to a string that is formatted into an
+// error so that the user may know if it was a specific link that went awry.
 func DownloadWorks(dn string, ml map[string]string) error {
 	c := make(chan error)
-	// i := 2
+	retval := ""
+	//i := 2
 	for key, val := range ml {
 		go func(c chan error) {
 			// Get the response from a single work's link.
 			resp, err := http.Get(val)
 			if err != nil {
-				resp.Body.Close()
 				c <- err
 				return
 			}
 			defer resp.Body.Close()
 
 			// Then on that web page, find the link to the zip of the work.
-			zl := GetZipLink(resp.Body, val)
+			zl, err := GetZipLink(resp.Body, val)
+			if err != nil {
+				c <- err
+				return
+			}
+
 			fn := dn + "/" + key + ".zip"
 			err = DownloadFile(fn, zl)
 			if err != nil {
@@ -152,8 +159,7 @@ func DownloadWorks(dn string, ml map[string]string) error {
 
 		cherr := <-c
 		if cherr != nil {
-			close(c)
-			return cherr
+			retval += "Error with key: " + key + ": " + cherr.Error() + "\n"
 		}
 		// if i == 0 {
 		// 	break
@@ -161,5 +167,8 @@ func DownloadWorks(dn string, ml map[string]string) error {
 		// i--
 	}
 	close(c)
+	if len(retval) != 0 {
+		return errors.New(retval)
+	}
 	return nil
 }
