@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 
 	"golang.org/x/net/html"
 )
@@ -128,8 +129,17 @@ func DownloadFile(fn string, url string) error {
 // If an error occurs, it will be appended to a string that is formatted into an
 // error so that the user may know if it was a specific link that went awry.
 func DownloadWorks(dn string, ml map[string]string) error {
+	var wg sync.WaitGroup
+	wg.Add(len(ml))
 	c := make(chan error)
 	var retval string
+
+	// go routine for receiving and making a string of errors.
+	go func() {
+		for errors := range c {
+			retval += "Error : " + errors.Error() + "\n"
+		}
+	}()
 
 	for key, val := range ml {
 		go func(key, val string) {
@@ -137,6 +147,7 @@ func DownloadWorks(dn string, ml map[string]string) error {
 			resp, err := http.Get(val)
 			if err != nil {
 				c <- err
+				wg.Done()
 				return
 			}
 
@@ -145,6 +156,7 @@ func DownloadWorks(dn string, ml map[string]string) error {
 			resp.Body.Close()
 			if err != nil {
 				c <- err
+				wg.Done()
 				return
 			}
 
@@ -154,16 +166,11 @@ func DownloadWorks(dn string, ml map[string]string) error {
 				c <- err
 				return
 			}
-			c <- nil
+			wg.Done()
 		}(key, val)
 	}
 
-	for i := 0; i < len(ml); i++ {
-		cherr := <-c
-		if cherr != nil {
-			retval += "Error : " + cherr.Error() + "\n"
-		}
-	}
+	wg.Wait()
 	close(c)
 
 	if len(retval) != 0 {
