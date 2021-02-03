@@ -19,7 +19,7 @@ go run ./cmd -ap=https://www.aozora.gr.jp/index_pages/person35.html -dn=osamu
 ```
 
 ### Assumptions
-- As already stated, the provided link must be of the form https://www.aozora.gr.jp/index_pages/personxx.html
+- As previously stated, the provided link must be of the form https://www.aozora.gr.jp/index_pages/personxx.html
 - This program only downloads works that are zip files (which have a .txt file inside of the zip), if no zip file is
 found, the program will return an error.
 - I've tested this on about 5 authors' web pages. It is possible there are other authors' pages that have
