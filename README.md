@@ -1,5 +1,5 @@
 # aozora-scraper
-This is a small concurrent webscraper that downloads all works of an author from https://www.aozora.gr.jp/
+This is a small CLI concurrent webscraper that downloads all works of an author from https://www.aozora.gr.jp/
 
 ## !! WARNING !!
 This program was created so that I could learn a bit about go routines. If you use this program, do NOT use it 
@@ -10,8 +10,8 @@ possibly get you in trouble. Be kind and responsible.
 It has the following command line flags:
 - ap: author page, such as https://www.aozora.gr.jp/index_pages/person11.html The program accepts any link
 provided to it to be of that format, where each author's url is distinguished by the person number ("/personxx.html")
-- dn: directory name. This is the location of where the program will save all the files. Example, "works" would save
-the files to a folder named works. Note, the directory name must not exist already, it must be a new directory.
+- dn: directory name. This is the location of where the program will save all the files. Example, "osamu" would save
+the files to a folder named osamu. Note, the directory name must not exist already, it must be a new directory.
 
 An example of how one would run it:
 ```
