@@ -1,9 +1,10 @@
 # aozora-scraper
-This is a small concurrent webscraper that downloads all works of a single author from https://www.aozora.gr.jp/
+This is a small concurrent webscraper that downloads all works of an author from https://www.aozora.gr.jp/
 
 ## !! WARNING !!
-This was created for the intent of how to use go routines. If you use this program, do NOT use it maliciously.
-Excessive requests could possibly result in your IP being blacklisted.
+This program was created so that I could learn a bit about go routines. If you use this program, do NOT use it 
+maliciously or irresponsibly. Excessive requests could put unneccessary burden on the receiving website, and 
+possibly get you in trouble. Be kind and responsible.
 
 ## How to use this program
 It has the following command line flags:
