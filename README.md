@@ -2,9 +2,8 @@
 This is a small CLI concurrent webscraper that downloads all works of an author from https://www.aozora.gr.jp/
 
 ## !! WARNING !!
-This program was created so that I could learn a bit about go routines. If you use this program, do NOT use it 
-maliciously or irresponsibly. Excessive requests could put unneccessary burden on the receiving website, and 
-possibly get you in trouble. Be kind and responsible.
+This program is purely for educational purposes.
+If you use this program, do NOT use it maliciously or irresponsibly. Excessive requests could put unneccessary burden on the receiving website, and possibly get you in trouble. Be kind and responsible.
 
 ## How to use this program
 It has the following command line flags:
@@ -16,6 +15,9 @@ An example of how one would run it:
 ```
 go run ./cmd -ap=https://www.aozora.gr.jp/index_pages/person35.html -dn=osamu
 ```
+
+## Why did you make this?
+I wanted to learn more about web scraping, Go routines, and concurrency.
 
 ### Assumptions
 - As already stated, the provided link must be of the form https://www.aozora.gr.jp/index_pages/personxx.html
