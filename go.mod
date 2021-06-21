@@ -1,4 +1,4 @@
-module AozoraScraper
+module github.com/travis-james/aozora-scraper
 
 go 1.15
 

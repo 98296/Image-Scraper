@@ -1,11 +1,12 @@
 package main
 
 import (
-	"AozoraScraper/scraper"
 	"flag"
 	"fmt"
 	"net/http"
 	"os"
+
+	"github.com/travis-james/aozora-scraper/scraper"
 )
 
 func main() {
